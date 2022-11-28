@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Sign Up Form by Colorlib</title>
+<title>Sign Up Form</title>
 
 <!-- Font Icon -->
 <link rel="stylesheet"
@@ -15,8 +15,8 @@
 </head>
 <body>
 
+<input type="hidden" id="status" value="<%= request.getAttribute("status") %>>">
 	<div class="main">
-
 		<!-- Sign up form -->
 		<section class="signup">
 			<div class="container">
@@ -61,6 +61,14 @@
 
 
 	</div>
+	<script type="text/javascript">
+		var status = document.getElementById("status").value;
+		if (status == "failed") {
+			swal("Sorry", "Wrong username and password", "failed");
+		}
+	</script>
+</body>
+</html>
 	<!-- JS -->
 	<!-- <script src="vendor/jquery/jquery.min.js"></script>
 	<script src="js/main.js"></script> -->

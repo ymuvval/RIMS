@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <Resource name="jdbc/rims"
+  	auth="Container"
+  	type="db.DBConnectionPool"
+  	factory="db.ResourceFactory"
+  	driver="com.mysql.jdbc.Driver"
+  	singleton="true"
+  	url="jdbc:mysql://localhost:3306/rims?useSSL=false"
+  	username="root"
+  	password=""
+  />
+  <Resource name="repo/user"
+  	auth="Container"
+  	type="repository.UserRepo"
+  	resType="repository.UserRepo"
+  	factory="resource.ResourceFactory"
+  />
+  <Resource name="service/user"
+  	auth="Container"
+  	type="service.UserService"
+  	resType="service.UserService"
+  	factory="resource.ResourceFactory"
+  />
+  <Resource name="repo/manager"
+  	auth="Container"
+  	type="repository.ManagerRepo"
+  	resType="repository.ManagerRepo"
+  	factory="resource.ResourceFactory"
+  />
+  <Resource name="service/manager"
+  	auth="Container"
+  	type="service.ManagerService"
+  	resType="service.ManagerService"
+  	factory="resource.ResourceFactory"
+  />
+  <Resource name="repo/employee"
+  	auth="Container"
+  	type="repository.EmployeeRepo"
+  	resType="repository.EmployeeRepo"
+  	factory="resource.ResourceFactory"
+  />
+  <Resource name="service/employee"
+  	auth="Container"
+  	type="service.EmployeeService"
+  	resType="service.EmployeeService"
+  	factory="resource.ResourceFactory"
+  />
+</Context>

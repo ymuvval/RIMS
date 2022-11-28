@@ -1,7 +1,8 @@
-package signup;
+package web;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import db.DBConnectionPool;
+import model.User;
+import repository.ManagerRepo;
+import repository.UserRepo;
 import service.UserService;
 import service.ManagerService;
 
@@ -20,48 +24,44 @@ import service.ManagerService;
 @WebServlet("/signup")
 public class signup extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private UserService getUserServiceObj(String email, String pass) {
-		DBConnectionPool dbConnPool = new DBConnectionPool(
-			"com.mysql.jdbc.Driver",
-			"jdbc:mysql://localhost:3306/rims",
-			"root", ""
-		);
-//		Check user role using email and initiate the serive(manager or employee)
-		return new ManagerService(dbConnPool);
+	
+	@Resource(name="jdbc/rims")
+	private DBConnectionPool dbConnPool;
+	
+	@Resource(name="repo/manager")
+	private ManagerRepo managerRepo;
+	
+	@Resource(name="service/manager")
+	private ManagerService managerService;
+	
+	public void init() {
+		this.managerRepo.setConnpool(dbConnPool);
+		this.managerService.setManagerRepo(this.managerRepo);
 	}
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-//    public signup() {
-//        super();
-//        // TODO Auto-generated constructor stub
-//    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		// doGet(request, response);
 		RequestDispatcher dispatcher = null;
 		String name = request.getParameter("name");
 		String email = request.getParameter("email");
 		String pass = request.getParameter("pass");
-		UserService user = this.getUserServiceObj(email, pass);
+		
+		if (this.managerService.IsUserPresent(email) == null) {
+//			send user present error
+			
+		}
+		User user = new User() {};
 		user.setName(name);
 		user.setEmail(email);
 		user.setPassword(pass);
+		user.setRole("MANAGER");
 		try {
-			user.CreateUser(user);
-			dispatcher = request.getRequestDispatcher("signup.jsp");
+			this.managerService.CreateUser(user);
+			dispatcher = request.getRequestDispatcher("login.jsp");
 			request.setAttribute("status", "success");
 			dispatcher.forward(request, response);
 		} catch (Exception e) {

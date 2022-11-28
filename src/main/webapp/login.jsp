@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Sign Up</title>
+<title>Sign In</title>
 
 <!-- Font Icon -->
 
@@ -12,6 +13,9 @@
 <!-- <link rel="stylesheet" href="css/style.css"> -->
 </head>
 <body>
+
+<input type="hidden" id="status" value="<%= request.getAttribute("status") %>>">
+<input type="hidden" id="loginErr" value="<%= request.getAttribute("loginErr") %>>">
 
 	<div class="main">
 
@@ -27,7 +31,8 @@
 
 					<div class="signin-form">
 						<h2 class="form-title">Login</h2>
-						<form method="" action="" class="register-form"
+						<span style="color: red;">${loginError}</span>
+						<form method="post" action="login" class="register-form"
 							id="login-form">
 							<div class="form-group">
 								<label for="username"><i
@@ -63,4 +68,11 @@
 	<script src="js/main.js"></script>
 </body>
 <!-- This templates was made by Colorlib (https://colorlib.com) -->
+	<script type="text/javascript">
+		var status = document.getElementById("status").value;
+		if (status == "failed") {
+			swal("Sorry", "Wrong username and password or user not found", "failed");
+			throw new ServletException("Mandatory Parameter missing");
+		}
+	</script>
 </html>
