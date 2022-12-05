@@ -35,8 +35,7 @@ public class ExpiryReportFactory implements ReportFactory {
 	@Override
 	public ArrayList<Item> GenerateReport() throws SQLException {
 		Date currentDate = new Date(Clock.systemUTC().millis());
-//		System.out.println(currentDate);
-		ArrayList<Item> items = itemRepo.List();
+		ArrayList<Item> items = itemRepo.ListWithCategory();
 		ArrayList<Item> expiring = new ArrayList<Item>();
 		for (int i = 0; i < items.size(); i++) {
 //			System.out.println(items.get(i).getExpiry().toString());
