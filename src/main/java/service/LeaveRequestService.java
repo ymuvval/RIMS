@@ -10,6 +10,19 @@ import repository.UserRepo;
 
 public class LeaveRequestService implements LeaveRequestHandler {
 	private UserRepo userRepo;
+	public UserRepo getUserRepo() {
+		return userRepo;
+	}
+
+	public void setUserRepo(UserRepo userRepo) {
+		this.userRepo = userRepo;
+	}
+
+	public LeaveRepo getLeaveRepo() {
+		return leaveRepo;
+	}
+
+
 	private LeaveRepo leaveRepo;
 
 	

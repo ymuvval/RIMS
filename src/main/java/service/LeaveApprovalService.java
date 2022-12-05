@@ -3,6 +3,7 @@ package service;
 import java.sql.SQLException;
 
 import model.Leave;
+import model.ReqStatus;
 import model.User;
 import repository.LeaveRepo;
 import repository.UserRepo;
@@ -33,9 +34,10 @@ public class LeaveApprovalService implements LeaveApprovalHandler {
 	
 
 	@Override
-	public void ApproveLeave(Integer id) throws SQLException {
+	public void ApproveLeave(Integer id, String status) throws SQLException {
 		NotificationObserver observer = this.makeLeaveApprovalObserver();
-		Leave leave = leaveRepo.Get(id);
+		Leave leave = this.leaveRepo.Get(id);
+		leave.setStatus(ReqStatus.valueOf(status.toUpperCase()));
 		User emp = userRepo.GetByPk(leave.getEmpId());
 		observer.setUser(emp);
 		leaveRepo.UpdateStatus(leave);
