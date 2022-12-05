@@ -12,5 +12,6 @@ public interface IItemRepo {
 	abstract public void Update(Item item) throws SQLException;
 	abstract public ArrayList<Item> List() throws SQLException;
 	abstract public void Delete(Integer id) throws SQLException;
+	abstract public ArrayList<Item> ListWithCategory() throws SQLException;
 
 }

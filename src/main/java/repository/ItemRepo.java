@@ -26,19 +26,27 @@ public class ItemRepo implements IItemRepo {
 	private static final String UPDATE_ITEM = "UPDATE `rims`.`item` SET `name` = ?, `category_id` = ?, `quantity` = ?, `price` = ?, `expiry` = ? WHERE `id` = ?;";
 	private static final String DELETE_ITEM = "DELETE FROM `rims`.`item` WHERE `id` = ?;";
 	private static final String LIST_ITEM = "SELECT * FROM `rims`.`item` ORDER BY `id`;";
+	private static final String LIST_ITEM_WITH_CATEGORY = "SELECT `item`.`id` as `id`, name, category_id, quantity, price, expiry, `category`.`type`\n"
+			+ "FROM `rims`.`item`\n"
+			+ "INNER JOIN `rims`.`category` ON `rims`.`item`.`category_id`=`category`.`id`;";
 
+	public Connection getConn() {
+		return this.connpool.create();
+	}
+	
 	@Override
 	public Item Get(Integer id) throws SQLException {
 		System.out.println(GET_ITEM);
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(GET_ITEM);
 			preparedStatement.setInt(1, id);
 			ResultSet rs = preparedStatement.executeQuery();
 			Item item = new Item() {};
 			if (rs.next()) {
+				item.setId(rs.getInt("id"));
 				item.setName(rs.getString("name"));
 				item.setCategoryId(rs.getInt("category_id"));
 				item.setQuantity(rs.getInt("quantity"));
@@ -48,11 +56,15 @@ public class ItemRepo implements IItemRepo {
 			return item;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 
 	@Override
@@ -61,7 +73,7 @@ public class ItemRepo implements IItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(ADD_ITEM);
 			preparedStatement.setString(1, item.getName());
 			preparedStatement.setInt(2, item.getCategoryId());
@@ -71,9 +83,14 @@ public class ItemRepo implements IItemRepo {
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 
@@ -83,7 +100,7 @@ public class ItemRepo implements IItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(UPDATE_ITEM);
 			preparedStatement.setString(1, item.getName());
 			preparedStatement.setInt(2, item.getCategoryId());
@@ -94,11 +111,15 @@ public class ItemRepo implements IItemRepo {
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return;
 	}
 
 	@Override
@@ -107,12 +128,13 @@ public class ItemRepo implements IItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(LIST_ITEM);
 			ResultSet rs = preparedStatement.executeQuery();
 			ArrayList<Item> items = new ArrayList<Item>();
-			if (rs.next()) {
+			while (rs.next()) {
 				Item item = new Item() {};
+				item.setId(rs.getInt("id"));
 				item.setName(rs.getString("name"));
 				item.setCategoryId(rs.getInt("category_id"));
 				item.setQuantity(rs.getInt("quantity"));
@@ -123,11 +145,15 @@ public class ItemRepo implements IItemRepo {
 			return items;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 
 	@Override
@@ -136,15 +162,55 @@ public class ItemRepo implements IItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(DELETE_ITEM);
 			preparedStatement.setInt(1, id);
-			preparedStatement.executeQuery();
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
+		}
+	}
+	
+	@Override
+	public ArrayList<Item> ListWithCategory() throws SQLException {
+		System.out.println(LIST_ITEM_WITH_CATEGORY);
+		Connection dbConn = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			dbConn = this.getConn();
+			preparedStatement = dbConn.prepareStatement(LIST_ITEM_WITH_CATEGORY);
+			ResultSet rs = preparedStatement.executeQuery();
+			ArrayList<Item> items = new ArrayList<Item>();
+			while (rs.next()) {
+				Item item = new Item() {};
+				item.setId(rs.getInt("id"));
+				item.setName(rs.getString("name"));
+				item.setCategoryId(rs.getInt("category_id"));
+				item.setQuantity(rs.getInt("quantity"));
+				item.setPrice(rs.getDouble("price"));
+				item.setExpiry(rs.getDate("expiry"));
+				item.setCategoryType(rs.getString("type"));
+				items.add(item);
+			}
+			return items;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 

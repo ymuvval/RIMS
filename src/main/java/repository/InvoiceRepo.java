@@ -19,32 +19,74 @@ public class InvoiceRepo implements IInvoiceRepo {
 		this.connpool = connpool;
 	}
 	
+	private static final String GET_INVOICE = "SELECT * FROM `rims`.`invoice` WHERE `id` = ?;";
 	private static final String ADD_INVOICE = "INSERT INTO `rims`.`invoice` (`bill_amount`, `discount`, `final_amount`) VALUES (?, ?, ?);";
 	private static final String UPDATE_INVOICE = "UPDATE `rims`.`invoice` SET `bill_amount` = ?, `discount` = ?, `final_amount` = ? WHERE `id` = ?;";
 	private static final String DELETE_INVOICE = "DELETE FROM `rims`.`invoice` WHERE `id` = ?;";
 
+	public Connection getConn() {
+		return this.connpool.create();
+	}
+	
+	@Override
+	public Invoice GetByPk(Integer id) throws SQLException {
+		System.out.println(GET_INVOICE);
+		Connection dbConn = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			dbConn = this.getConn();
+			preparedStatement = dbConn.prepareStatement(GET_INVOICE);
+			preparedStatement.setInt(1, id);
+			ResultSet rs = preparedStatement.executeQuery();
+			Invoice invoice = new Invoice() {};
+			if (rs.next()) {
+				invoice.setId(rs.getInt("id"));
+				invoice.setBill_amount(rs.getDouble("bill_amount"));
+				invoice.setDiscount(rs.getDouble("discount"));
+				invoice.setFinal_bill(rs.getDouble("final_amount"));
+			}
+			return invoice;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
+		}
+	}
+	
 	@Override
 	public Invoice Add(Invoice invoice) throws SQLException {
 		System.out.println(ADD_INVOICE);
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
-			preparedStatement = dbConn.prepareStatement(ADD_INVOICE);
+			dbConn = this.getConn();
+			preparedStatement = dbConn.prepareStatement(ADD_INVOICE, PreparedStatement.RETURN_GENERATED_KEYS);
 			preparedStatement.setDouble(1, invoice.getBill_amount());
 			preparedStatement.setDouble(2, invoice.getDiscount());
 			preparedStatement.setDouble(3, invoice.getFinal_bill());
 			preparedStatement.executeUpdate();
-			ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-			invoice.setId(generatedKeys.getInt(1));
+			ResultSet rs = preparedStatement.getGeneratedKeys();
+			if (rs.next()) {
+				invoice.setId(rs.getInt(1));
+			}
 			return invoice;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 
 	@Override
@@ -53,7 +95,7 @@ public class InvoiceRepo implements IInvoiceRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(UPDATE_INVOICE);
 			preparedStatement.setDouble(1, invoice.getBill_amount());
 			preparedStatement.setDouble(2, invoice.getDiscount());
@@ -62,9 +104,14 @@ public class InvoiceRepo implements IInvoiceRepo {
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 		return;
 	}
@@ -75,15 +122,20 @@ public class InvoiceRepo implements IInvoiceRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(DELETE_INVOICE);
 			preparedStatement.setInt(1, id);
-			preparedStatement.executeQuery();
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 
