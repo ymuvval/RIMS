@@ -1,9 +1,11 @@
 package service;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import Exception.UserAlreadyExist;
 import model.Employee;
+import model.ShiftType;
 import model.User;
 import repository.ManagerRepo;
 import repository.UserRepo;
@@ -39,8 +41,8 @@ public class ManagerService extends UserService implements EmployeeManagementSer
 	}
 	
 	@Override
-	public void UpdateEmployee(Integer id, String name) throws SQLException {
-		this.managerRepo.Update(id, name);
+	public void UpdateEmployee(Integer id, String name, ShiftType shift) throws SQLException {
+		this.managerRepo.Update(id, name, shift);
 	}
 	
 	@Override
@@ -49,6 +51,10 @@ public class ManagerService extends UserService implements EmployeeManagementSer
 			throw new UserAlreadyExist("User already present");
 		}
 		return this.managerRepo.Create(user);
+	}
+	
+	public ArrayList<User> GetEmployees(Integer id) throws SQLException {
+		return this.managerRepo.GetEmployees(id);
 	}
 
 }

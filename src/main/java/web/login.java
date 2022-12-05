@@ -1,6 +1,7 @@
 package web;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
@@ -11,9 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import model.*;
+import db.DBConnectionPool;
+import model.LoginBean;
+import model.User;
 import repository.UserRepo;
-import db.*;
 import service.UserService;
 
 /**
@@ -33,12 +35,11 @@ public class login extends HttpServlet {
 	private UserService userService;
 	
 	public void init() {
-		System.out.print("came came came came");
 		this.userRepo.setConnpool(dbConnPool);
 		this.userService.setUserRepo(userRepo);
 	}
 	
-	private User getUserServiceObj(String email, String pass) {
+	private User getUserServiceObj(String email, String pass) throws SQLException {
 		LoginBean lb = new LoginBean();
 		lb.setUname(email);
 		lb.setPass(pass);
@@ -53,20 +54,37 @@ public class login extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		RequestDispatcher dispatcher = null;
 		String email = request.getParameter("username");
 		String pass = request.getParameter("password");
-		User user = this.getUserServiceObj(email, pass);
-		if (user == null) {
-			request.setAttribute("loginError", "wrong creds or user doesnt exist");
-			request.setAttribute("status", "failed");
-			dispatcher = request.getRequestDispatcher("login.jsp");
-		} else {
-			session.setAttribute("name", user.getEmail());
-			session.setAttribute("role", user.getRole());
-			dispatcher = request.getRequestDispatcher("index.jsp");
+		User user = null;
+		try {
+			user = this.getUserServiceObj(email, pass);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
-		dispatcher.forward(request, response);
+		if (user == null) {
+			request.setAttribute("error", "wrong creds or user doesnt exist");
+			request.setAttribute("status", "failed");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/login.jsp");
+			dispatcher.forward(request, response);
+//			response.sendRedirect(request.getContextPath() + "/login.jsp");
+		} else {
+			if (user.getManagerId() != null && user.getManagerId() > 0) {
+				try {
+					User manager = this.userRepo.GetByPk(user.getManagerId());
+					session.setAttribute("manager_id", user.getManagerId());
+					session.setAttribute("manager_name", manager.getName());
+					
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			session.setAttribute("userid", user.getId());
+			session.setAttribute("name", user.getName().toUpperCase());
+			session.setAttribute("role", user.getRole());
+			session.setAttribute("email", user.getEmail());
+			response.sendRedirect(request.getContextPath() + "/home.jsp");
+		}
 		
 	}
 
