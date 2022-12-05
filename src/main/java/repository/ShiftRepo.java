@@ -25,13 +25,17 @@ public class ShiftRepo implements IShiftRepo {
 	private static final String ADD_SHIFT= "INSERT INTO `rims`.`shift` (`user_id`, `type`) VALUES (?, ?);";
 	private static final String UPDATE_SHIFT= "UPDATE `rims`.`shift` SET `type` = ? WHERE `user_id` = ?;";
 
+	public Connection getConn() {
+		return this.connpool.create();
+	}
+	
 	@Override
 	public Shift GetByPk(Integer id) throws SQLException {
 		System.out.println(GET_SHIFT);
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(GET_SHIFT);
 			preparedStatement.setInt(1, id);
 			ResultSet rs = preparedStatement.executeQuery();
@@ -44,11 +48,15 @@ public class ShiftRepo implements IShiftRepo {
 			return shift;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 	
 	@Override
@@ -57,7 +65,7 @@ public class ShiftRepo implements IShiftRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(GET_EMP_SHIFT);
 			preparedStatement.setInt(1, empId);
 			ResultSet rs = preparedStatement.executeQuery();
@@ -70,11 +78,15 @@ public class ShiftRepo implements IShiftRepo {
 			return shift;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 	
 	@Override
@@ -83,16 +95,21 @@ public class ShiftRepo implements IShiftRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(ADD_SHIFT);
 			preparedStatement.setInt(1, shift.getEmpId());
 			preparedStatement.setString(2, shift.getType().name());
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}		
 	}
 
@@ -102,16 +119,21 @@ public class ShiftRepo implements IShiftRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(UPDATE_SHIFT);
 			preparedStatement.setString(1, shift.getType().name());
 			preparedStatement.setInt(2, shift.getEmpId());
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 		return;		
 	}
