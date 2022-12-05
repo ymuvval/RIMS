@@ -5,55 +5,93 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Sign In</title>
+<title>RIMS</title>
 
 <!-- Font Icon -->
 
 <!-- Main css -->
 <!-- <link rel="stylesheet" href="css/style.css"> -->
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+input[type=text], input[type=password] {
+  border-radius: 25px;
+  width: 25%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid green;
+  box-sizing: border-box;
+}
+
+button {
+  border-radius: 25px;
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 25%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.container {
+  padding: 16px;
+}
+
+span.psw {
+  float: center;
+  padding-top: 16px;
+}
+
+</style>
 </head>
 <body>
 
-<input type="hidden" id="status" value="<%= request.getAttribute("status") %>>">
-<input type="hidden" id="loginErr" value="<%= request.getAttribute("loginErr") %>>">
+<input type="hidden" id="status" value="<%= request.getAttribute("status") %>">
+<input type="hidden" id="loginErr" value="<%= request.getAttribute("loginErr") %>">
 
-	<div class="main">
-
-		<!-- Sing in  Form -->
-		<section class="sign-in">
+	<div>
+		<section>
 			<div class="container">
-				<div class="signin-content">
-					<div class="signin-image">
-						<a href="signup.jsp" class="signup-image-link">Create an
-							account
-						</a>
-					</div>
+				<div>
 
-					<div class="signin-form">
-						<h2 class="form-title">Login</h2>
+					<div>
+						<h2 align="center">Login</h2>
 						<span style="color: red;">${loginError}</span>
-						<form method="post" action="login" class="register-form"
-							id="login-form">
-							<div class="form-group">
-								<label for="username"><i
-									class="zmdi zmdi-account material-icons-name"></i></label> <input
+						<form align="center" method="post" action="login">
+							<div>
+								<label for="username"></label>
+								<input
 									type="text" name="username" id="username"
 									placeholder="Your Name" />
 							</div>
-							<div class="form-group">
-								<label for="password"><i class="zmdi zmdi-lock"></i></label> <input
+							<div >
+								<label for="password"></label> <input
 									type="password" name="password" id="password"
 									placeholder="Password" />
 							</div>
-							<div class="form-group">
-								<input type="checkbox" name="remember-me" id="remember-me"
-									class="agree-term" /> <label for="remember-me"
-									class="label-agree-term"><span><span></span></span>Remember
-									me</label>
+								<%
+									String err = (String) request.getAttribute("error");
+									String message = (String) request.getAttribute("message");
+									if (err != null && !err.equals("")) {
+										out.print("<text style='color:red'>" + "   " + err + "</text>");
+									}
+									if (message != null && !message.equals("")) {
+										out.print("<text style='color:green'>" + "   " + message + "</text>");
+									}
+								%>
+							<div>
+								<button type="submit">Login</button>
 							</div>
-							<div class="form-group form-button">
-								<input type="submit" name="signin" id="signin"
-									class="form-submit" value="Log in" />
+							<div>
+								<a href="forgot-pass.jsp">Forgot Password</a>
+								<br>
+								<a href="signup.jsp">Create an account</a>
 							</div>
 						</form>
 					</div>

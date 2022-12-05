@@ -31,13 +31,17 @@ public class EmployeeRepo implements IEmployeeRepo {
 		this.connpool = connpool;
 	}
 	
+	public Connection getConn() {
+		return this.connpool.create();
+	}
+
 	@Override
 	public Employee Get(String email) throws SQLException {
 		System.out.println(GET_USER);
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(GET_USER);
 			preparedStatement.setString(1, email);
 			System.out.println(preparedStatement);
@@ -52,8 +56,12 @@ public class EmployeeRepo implements IEmployeeRepo {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 		return null;
 	}

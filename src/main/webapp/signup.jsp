@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Sign Up Form</title>
+<title>RIMS</title>
 
 <!-- Font Icon -->
 <link rel="stylesheet"
@@ -13,47 +13,91 @@
 <!-- Main css -->
 <!-- <link rel="stylesheet" href="css/style.css"> -->
 </head>
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+/* form {border: 3px solid #f1f1f1;} */
+
+input[type=text], input[type=password] {
+  border-radius: 25px;
+  width: 33%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid green;
+  box-sizing: border-box;
+}
+
+button {
+  border-radius: 25px;
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 33%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.container {
+  padding: 16px;
+}
+
+span.psw {
+  float: center;
+  padding-top: 16px;
+}
+
+</style>
 <body>
 
 <input type="hidden" id="status" value="<%= request.getAttribute("status") %>>">
-	<div class="main">
+	<div>
 		<!-- Sign up form -->
-		<section class="signup">
+		<section>
 			<div class="container">
-				<div class="signup-content">
-					<div class="signup-form">
-						<h2 class="form-title">Sign up</h2>
+				<div>
+					<div>
+						<h2 align="center">Sign up</h2>
 					
-						<form method="post" action="signup" class="register-form"
-							id="register-form">
-							<div class="form-group">
-								<label for="name"><i
-									class="zmdi zmdi-account material-icons-name"></i></label> <input
-									type="text" name="name" id="name" placeholder="Your Name" />
+						<form align="center" method="post" action="signup">
+							<div>
+								<label for="name"></label>
+								<input type="text" name="name" id="name" placeholder="Your Name" />
+							</div>
+							<div>
+								<label for="email"></label>
+								<input type="text" name="email" id="email" placeholder="Your Email" />
+							</div>
+							<div>
+								<label for="name"></label>
+								<input type="text" placeholder="Enter Question" name="question" id="question" required>
+							</div>
+							<div>
+								<label for="name"></label>
+								<input type="text" placeholder="Enter Answer" name="answer" id="answer" required>
 							</div>
 							<div class="form-group">
-								<label for="email"><i class="zmdi zmdi-email"></i></label> <input
-									type="email" name="email" id="email" placeholder="Your Email" />
+								<label for="pass"></label>
+								<input type="password" name="pass" id="pass" placeholder="Password" />
 							</div>
-							<div class="form-group">
-								<label for="pass"><i class="zmdi zmdi-lock"></i></label> <input
-									type="password" name="pass" id="pass" placeholder="Password" />
-							</div>
-							<div class="form-group">
-								<label for="re-pass"><i class="zmdi zmdi-lock-outline"></i></label>
+							<div>
+								<label for="re-pass"></label>
 								<input type="password" name="re_pass" id="re_pass"
 									placeholder="Repeat your password" />
 							</div>
-							<div class="form-group form-button">
-								<input type="submit" name="signup" id="signup"
-									class="form-submit" value="Register" />
+							<div>
+
+								<button type="submit">Register</button>
+							</div>
+							<div>
+								<a href="login.jsp">I am already member </a>
 							</div>
 						</form>
-					</div>
-					<div class="signup-image">
-						<a href="login.jsp" class="signup-image-link">I am already
-							member
-						</a>
+						
 					</div>
 				</div>
 			</div>
