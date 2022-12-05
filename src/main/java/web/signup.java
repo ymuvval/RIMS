@@ -1,6 +1,7 @@
 package web;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.annotation.Resource;
 import javax.servlet.RequestDispatcher;
@@ -10,12 +11,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import db.DBConnectionPool;
 import model.User;
 import repository.ManagerRepo;
 import repository.UserRepo;
-import service.UserService;
 import service.ManagerService;
 
 /**
@@ -31,12 +30,17 @@ public class signup extends HttpServlet {
 	@Resource(name="repo/manager")
 	private ManagerRepo managerRepo;
 	
+	@Resource(name="repo/user")
+	private UserRepo userRepo;
+	
 	@Resource(name="service/manager")
 	private ManagerService managerService;
 	
 	public void init() {
 		this.managerRepo.setConnpool(dbConnPool);
+		this.userRepo.setConnpool(dbConnPool);
 		this.managerService.setManagerRepo(this.managerRepo);
+		this.managerService.setUserRepo(userRepo);
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,16 +53,23 @@ public class signup extends HttpServlet {
 		String name = request.getParameter("name");
 		String email = request.getParameter("email");
 		String pass = request.getParameter("pass");
+		String question = request.getParameter("question");
+		String answer = request.getParameter("answer");
 		
-		if (this.managerService.IsUserPresent(email) == null) {
+		try {
+			if (this.managerService.IsUserPresent(email) == null) {
 //			send user present error
-			
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
 		User user = new User() {};
 		user.setName(name);
 		user.setEmail(email);
 		user.setPassword(pass);
 		user.setRole("MANAGER");
+		user.setAnswer(answer);
+		user.setQuestion(question);
 		try {
 			this.managerService.CreateUser(user);
 			dispatcher = request.getRequestDispatcher("login.jsp");
