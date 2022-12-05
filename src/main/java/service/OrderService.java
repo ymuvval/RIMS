@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import model.Invoice;
 import model.Order;
 import model.OrderItem;
+import repository.InvoiceRepo;
 import repository.OrderItemRepo;
 import repository.OrderRepo;
 
@@ -28,17 +29,22 @@ public class OrderService {
 		this.orderRepo = oR;
 	}
 	
-	public OrderService(OrderRepo or, OrderItemRepo oir, InvoiceService is) {
+	public OrderService(OrderRepo or, OrderItemRepo oir, InvoiceRepo ir, InvoiceService is) {
 		super();
-		this.setInvoiceRepo(or);
+		this.orderRepo = or;
 		this.setOrderItemRepo(oir);
+		is.setInvoiceRepo(ir);
 		this.setInvoiceService(is);
 	}
+	
+	public OrderRepo getOrderRepo() {
+		return orderRepo;
+	}
 
-	public void setInvoiceRepo(OrderRepo orderRepo) {
+	public void setOrderRepo(OrderRepo orderRepo) {
 		this.orderRepo = orderRepo;
 	}
-	
+
 	public OrderItemRepo getOrderItemRepo() {
 		return orderItemRepo;
 	}
@@ -46,7 +52,7 @@ public class OrderService {
 	public void setOrderItemRepo(OrderItemRepo orderItemRepo) {
 		this.orderItemRepo = orderItemRepo;
 	}
-	
+
 	public InvoiceService getInvoiceService() {
 		return invoiceService;
 	}
@@ -74,16 +80,21 @@ public class OrderService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void UpdateOrder(Order updatedOrder) {
 		try {
 			this.orderRepo.Update(updatedOrder);
 			ArrayList<OrderItem> orderItems = this.orderItemRepo.List(updatedOrder.getId());
 			updatedOrder.setItems(orderItems);
-			if (updatedOrder.getInvoiceId() == null) {
+			if (orderItems.size() == 0) {
+				this.invoiceService.UpdateInvoice(updatedOrder);
+				return;
+			}
+			System.out.println("invoice id " + updatedOrder.getInvoiceId());
+			if (updatedOrder.getInvoiceId() == null || updatedOrder.getInvoiceId() <= 0) {
 				Invoice invoice = this.invoiceService.GenerateInvoice(updatedOrder);
 				updatedOrder.setInvoiceId(invoice.getId());
-				this.orderRepo.Update(updatedOrder);
+				this.orderRepo.UpdateOrderWithInvoice(updatedOrder);
 			} else {
 				this.invoiceService.UpdateInvoice(updatedOrder);
 			}
