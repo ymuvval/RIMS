@@ -20,10 +20,48 @@ public class OrderItemRepo implements IOrderItemRepo {
 		this.connpool = connpool;
 	}
 
-	private static final String ADD_ORDER_ITEM = "INSERT INTO `rims`.`item` (`order_id`, `item_id`, `price`, `quantity`) VALUES (?, ?, ?, ?);";
-	private static final String UPDATE_ORDER_ITEM = "UPDATE `rims`.`item` SET `order_id` = ?, `item_id` = ?, `quantity` = ? WHERE `id` = ?;";
-	private static final String DELETE_ORDER_ITEM = "DELETE FROM `rims`.`item` WHERE `id` = ?;";
-	private static final String LIST_ORDER_ITEMS = "SELECT * FROM `rims`.`item` WHERE `order_id` = ?;";
+	private static final String GET_ORDER_ITEM = "SELECT * FROM `rims`.`order_item` WHERE (`order_id` = ?) AND (`item_id` = ?);";
+	private static final String ADD_ORDER_ITEM = "INSERT INTO `rims`.`order_item` (`order_id`, `item_id`, `price`, `quantity`) VALUES (?, ?, ?, ?);";
+	private static final String UPDATE_ORDER_ITEM = "UPDATE `rims`.`order_item` SET `order_id` = ?, `item_id` = ?, `quantity` = ? WHERE `id` = ?;";
+	private static final String DELETE_ORDER_ITEM = "DELETE FROM `rims`.`order_item` WHERE `id` = ?;";
+	private static final String LIST_ORDER_ITEMS = "SELECT * FROM `rims`.`order_item` WHERE `order_id` = ?;";
+	
+	public Connection getConn() {
+		return this.connpool.create();
+	}
+	
+	@Override
+	public OrderItem Get(Integer orderId, Integer itemId) throws SQLException {
+		System.out.println(GET_ORDER_ITEM);
+		Connection dbConn = null;
+		PreparedStatement preparedStatement = null;
+		try {
+			dbConn = this.getConn();
+			preparedStatement = dbConn.prepareStatement(GET_ORDER_ITEM);
+			preparedStatement.setInt(1, orderId);
+			preparedStatement.setInt(2, itemId);
+			ResultSet rs = preparedStatement.executeQuery();
+			OrderItem orderItem = new OrderItem() {};
+			if (rs.next()) {
+				orderItem.setId(rs.getInt("id"));
+				orderItem.setOrder_id(rs.getInt("order_id"));
+				orderItem.setItem_id(rs.getInt("item_id"));
+				orderItem.setQuantity(rs.getInt("quantity"));
+				orderItem.setPrice(rs.getDouble("price"));
+			}
+			return orderItem;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
+		}
+	}
 
 	@Override
 	public void Add(OrderItem orderItem) throws SQLException {
@@ -31,7 +69,7 @@ public class OrderItemRepo implements IOrderItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(ADD_ORDER_ITEM);
 			preparedStatement.setInt(1, orderItem.getOrder_id());
 			preparedStatement.setInt(2, orderItem.getItem_id());
@@ -40,9 +78,14 @@ public class OrderItemRepo implements IOrderItemRepo {
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 	
@@ -52,7 +95,7 @@ public class OrderItemRepo implements IOrderItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(ADD_ORDER_ITEM);
 		    for (int i = 0; i < orderItems.size(); i++) {
 		        OrderItem orderItem = orderItems.get(i);
@@ -65,9 +108,14 @@ public class OrderItemRepo implements IOrderItemRepo {
 		    preparedStatement.executeBatch();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 
@@ -77,7 +125,7 @@ public class OrderItemRepo implements IOrderItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(UPDATE_ORDER_ITEM);
 			preparedStatement.setInt(1, orderItem.getOrder_id());
 			preparedStatement.setInt(2, orderItem.getItem_id());
@@ -86,9 +134,14 @@ public class OrderItemRepo implements IOrderItemRepo {
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 		return;
 	}
@@ -99,15 +152,20 @@ public class OrderItemRepo implements IOrderItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(DELETE_ORDER_ITEM);
 			preparedStatement.setInt(1, id);
-			preparedStatement.executeQuery();
+			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
 	}
 
@@ -117,12 +175,12 @@ public class OrderItemRepo implements IOrderItemRepo {
 		Connection dbConn = null;
 		PreparedStatement preparedStatement = null;
 		try {
-			dbConn = connpool.create();
+			dbConn = this.getConn();
 			preparedStatement = dbConn.prepareStatement(LIST_ORDER_ITEMS);
 			preparedStatement.setInt(1, orderId);
 			ResultSet rs = preparedStatement.executeQuery();
 			ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
-			if (rs.next()) {
+			while (rs.next()) {
 				OrderItem orderItem = new OrderItem() {};
 				orderItem.setId(rs.getInt("id"));
 				orderItem.setOrder_id(rs.getInt("order_id"));
@@ -134,11 +192,15 @@ public class OrderItemRepo implements IOrderItemRepo {
 			return orderItems;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw e;
 		} finally {
-			preparedStatement.close();
-			connpool.dead(dbConn);
+			if (preparedStatement != null) {
+				preparedStatement.close();
+			}
+			if (connpool != null) { 
+				connpool.dead(dbConn);
+			}
 		}
-		return null;
 	}
 
 }

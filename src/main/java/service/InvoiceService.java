@@ -42,9 +42,13 @@ public class InvoiceService {
 	
 	public void UpdateInvoice(Order order) {
 		Invoice invoice = this.makeInvoice();
+		invoice.setId(order.getInvoiceId());
 		invoice.setBill_amount(order.CalculateBill());
 		invoice.setDiscount(order.getDiscount());
 		invoice.setFinal_bill(invoice.getBill_amount() - order.getDiscount());
+		if (invoice.getFinal_bill() < 0.0) {
+			invoice.setFinal_bill(0.0);
+		}
 		try {
 			this.invoiceRepo.Update(invoice);
 		} catch (SQLException e) {
