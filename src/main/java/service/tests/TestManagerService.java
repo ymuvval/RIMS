@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import Exception.UserAlreadyExist;
 import model.Employee;
+import model.ShiftType;
 import model.User;
 import repository.ManagerRepo;
 import repository.UserRepo;
@@ -53,8 +54,8 @@ class TestManagerService {
 
 	@Test
 	void testUpdateEmployee() throws SQLException {
-		managerService.UpdateEmployee(1, "new_name");
-		verify(managerRepo).Update(1, "new_name");
+		managerService.UpdateEmployee(1, "new_name", ShiftType.valueOf("MORNING"));
+		verify(managerRepo).Update(1, "new_name", ShiftType.valueOf("MORNING"));
 	}
 
 	@Test
@@ -93,8 +94,8 @@ class TestManagerService {
 
 	@Test
 	void testUpdateEmployeeNegative() throws SQLException {
-		Mockito.doThrow(SQLException.class).when(managerRepo).Update(1, "new_name");
-		assertThrows(SQLException.class, () -> managerService.UpdateEmployee(1, "new_name"));
+		Mockito.doThrow(SQLException.class).when(managerRepo).Update(1, "new_name", ShiftType.valueOf("MORNING"));
+		assertThrows(SQLException.class, () -> managerService.UpdateEmployee(1, "new_name", ShiftType.valueOf("MORNING")));
 	}
 
 	@Test
