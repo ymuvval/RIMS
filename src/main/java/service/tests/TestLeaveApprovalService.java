@@ -47,7 +47,7 @@ class TestLeaveApprovalService {
 		when(leaveRepo.Get(1)).thenReturn(leaveSample);
 		when(userRepo.GetByPk(1)).thenReturn(empSample);
 		
-		las.ApproveLeave(1);
+		las.ApproveLeave(1, "APPROVED");
 		
 		verify(leaveRepo).UpdateStatus(leaveSample);
 		verify(userRepo).GetByPk(1);
@@ -68,7 +68,7 @@ class TestLeaveApprovalService {
 		
 		when(leaveRepo.Get(1)).thenThrow(new SQLException());
 		
-		assertThrows(SQLException.class, () -> las.ApproveLeave(1));
+		assertThrows(SQLException.class, () -> las.ApproveLeave(1, "APPROVED"));
 	}
 
 }
