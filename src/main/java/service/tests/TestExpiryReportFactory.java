@@ -53,21 +53,21 @@ class TestExpiryReportFactory {
 	
 	@Test
 	void testGenerateReportPositive() throws SQLException {
-		when(itemRepo.List()).thenReturn(items);
+		when(itemRepo.ListWithCategory()).thenReturn(items);
 		
 		ArrayList<Item> actual = erf.GenerateReport();
 		
-		verify(itemRepo).List();
+		verify(itemRepo).ListWithCategory();
 		assertEquals(expiring.size(), actual.size());
 	}
 	
 	@Test
 	void testGenerateReportNegative() throws SQLException {
-		when(itemRepo.List()).thenThrow(new SQLException());
+		when(itemRepo.ListWithCategory()).thenThrow(new SQLException());
 		
 		assertThrows(SQLException.class, () -> erf.GenerateReport());
 		
-		verify(itemRepo).List();
+		verify(itemRepo).ListWithCategory();
 	}
 
 }
